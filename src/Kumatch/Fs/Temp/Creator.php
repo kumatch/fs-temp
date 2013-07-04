@@ -3,6 +3,7 @@
 namespace Kumatch\Fs\Temp;
 
 use Kumatch\Fs\Temp\Name;
+use Kumatch\Fs\Temp\Cleaner;
 use Kumatch\Fs\Temp\Exception\Exception;
 
 abstract class Creator
@@ -16,6 +17,8 @@ abstract class Creator
     protected $suffix = "";
     /** @var  int */
     protected $mode = 0700;
+    /** @var bool  */
+    protected $keep = false;
 
     /** @var string  */
     protected $ngPattern = '!\.\.!';
@@ -72,6 +75,17 @@ abstract class Creator
     }
 
     /**
+     * @param $keep
+     * @return $this
+     */
+    public function keep($keep)
+    {
+        $this->keep = $keep ? true : false;
+
+        return $this;
+    }
+
+    /**
      * @return string
      * @throws Exception
      */
@@ -85,6 +99,10 @@ abstract class Creator
 
         if (!$this->_create($path, $this->mode)) {
             throw new Exception(sprintf('cannot create in %s', $this->directory));
+        }
+
+        if (!$this->keep) {
+            $this->registerShutdownCleaning($path);
         }
 
         return $path;
@@ -110,6 +128,15 @@ abstract class Creator
 
         return $result;
     }
+
+    /**
+     * @param $path
+     */
+    protected function registerShutdownCleaning($path)
+    {
+        register_shutdown_function('Kumatch\Fs\Temp\Cleaner::clean', $path);
+    }
+
 
     /**
      * @param $path

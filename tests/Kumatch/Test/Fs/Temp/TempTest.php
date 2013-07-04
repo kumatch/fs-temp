@@ -8,29 +8,16 @@ class TempTest extends \PHPUnit_Framework_TestCase
 {
     protected $skelton;
 
-    /** @var  string */
-    protected $tempPath;
 
     protected function setUp()
     {
         parent::setUp();
-
-        $this->tempPath = sys_get_temp_dir() . "/kumatch-test-fs-tmp-" . microtime(true);
     }
 
     protected function tearDown()
     {
         parent::tearDown();
-
-        if (file_exists($this->tempPath)) {
-            if (is_dir($this->tempPath)) {
-                rmdir($this->tempPath);
-            } else if (is_file($this->tempPath)) {
-                unlink($this->tempPath);
-            }
-        }
     }
-
 
     public function testコンストラクタでディレクトリを指定しない場合はシステム値を利用する()
     {

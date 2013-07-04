@@ -1,18 +1,8 @@
-fs-fileinfoextra
+fs-temp
 ===========
 
-A extended SplFileInfo class thin.
+A simple temporary file and directory manager for PHP.
 
-
-Added features
------
-
-* exists()
-* getExtension() - for PHP 5.3.5 or older
-* getMimeType() , with setMimeType() for sticky type
-* getMimeEncoding()
-* getFileHash($algorithm, $raw_output = false)
-* getFileHmac($algorithm, $key, $raw_output = false)
 
 
 License

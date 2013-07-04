@@ -145,6 +145,42 @@ class FileCreatorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('0644', $mode);
     }
 
+    public function test一時ファイルはプロセス終了時に削除されるよう準備される()
+    {
+        $creator = $this->getMockBuilder('Kumatch\Fs\Temp\FileCreator')
+            ->setConstructorArgs(array($this->dir))
+            ->setMethods(array('createUniquePathName', 'registerShutdownCleaning'))
+            ->getMock();
+        $creator->expects($this->once())
+            ->method('createUniquePathName')
+            ->will($this->returnValue($this->tempPath));
+        $creator->expects($this->once())
+            ->method('registerShutdownCleaning')
+            ->with($this->equalTo($this->tempPath));
+
+        $this->assertFalse(file_exists($this->tempPath));
+
+        /** @var FileCreator $creator */
+        $creator->create();
+    }
+
+    public function test一時ファイルをプロセス終了時に削除されないようにする()
+    {
+        $creator = $this->getMockBuilder('Kumatch\Fs\Temp\FileCreator')
+            ->setConstructorArgs(array($this->dir))
+            ->setMethods(array('createUniquePathName', 'registerShutdownCleaning'))
+            ->getMock();
+        $creator->expects($this->once())
+            ->method('createUniquePathName')
+            ->will($this->returnValue($this->tempPath));
+        $creator->expects($this->never())
+            ->method('registerShutdownCleaning');
+
+        $this->assertFalse(file_exists($this->tempPath));
+
+        /** @var FileCreator $creator */
+        $creator->keep(true)->create();
+    }
 
     /**
      * @expectedException \Kumatch\Fs\Temp\Exception\Exception
