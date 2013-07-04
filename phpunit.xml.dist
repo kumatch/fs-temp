@@ -15,7 +15,7 @@
         <log type="coverage-text" target="php://stdout" showUncoveredFiles="true" />
     </logging>
     <testsuites>
-        <testsuite name="Fs-FileInfoExtra Test Suite">
+        <testsuite name="Fs-Temp Test Suite">
             <directory>./tests/Kumatch/</directory>
         </testsuite>
     </testsuites>
