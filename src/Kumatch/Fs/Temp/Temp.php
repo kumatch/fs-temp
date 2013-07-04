@@ -2,9 +2,9 @@
 
 namespace Kumatch\Fs\Temp;
 
-use Kumatch\Fs\Temp\Name;
+use Kumatch\Fs\Temp\DirectoryCreator;
+use Kumatch\Fs\Temp\FileCreator;
 use Kumatch\Fs\Temp\Exception\Exception;
-use SplFileObject;
 
 class Temp
 {
@@ -28,97 +28,20 @@ class Temp
         }
     }
 
+
     /**
-     * @param int $mode
-     * @param string|null $prefix
-     * @param string|null $suffix
-     * @return string
-     * @throws Exception
+     * @return DirectoryCreator
      */
-    public function dir($mode = 0700, $prefix = null, $suffix = null)
+    public function dir()
     {
-        $ngPattern = '!\.\.!';
-        if (preg_match($ngPattern, $prefix) || preg_match($ngPattern, $suffix)) {
-            throw new Exception('invalid arguments');
-        }
-
-        $path = $this->createUniquePathName($prefix, $suffix);
-
-        if (!$path) {
-            throw new Exception(sprintf('cannot create directory in %s', $this->directory));
-        }
-
-        if (!$this->mkdir($path, $mode)) {
-            throw new Exception(sprintf('cannot create directory in %s', $this->directory));
-        }
-
-        return $path;
-    }
-
-    public function file($mode = 0600, $prefix = null, $suffix = null)
-    {
-        $ngPattern = '!\.\.!';
-        if (preg_match($ngPattern, $prefix) || preg_match($ngPattern, $suffix)) {
-            throw new Exception('invalid arguments');
-        }
-
-        $path = $this->createUniquePathName($prefix, $suffix);
-
-        if (!$path) {
-            throw new Exception(sprintf('cannot create file in %s', $this->directory));
-        }
-
-        if (!$this->touch($path, $mode)) {
-            throw new Exception(sprintf('cannot create file in %s', $this->directory));
-        }
-
-        return $path;
-    }
-
-
-    protected function createUniquePathName($prefix = null, $suffix = null)
-    {
-        $stock = 100;
-        $result = null;
-
-        while ($stock > 0) {
-            --$stock;
-
-            $name = Name::create($prefix, $suffix);
-            $path = sprintf('%s/%s', $this->directory, $name);
-
-            if (!file_exists($path)) {
-                $result = $path;
-                break;
-            }
-        }
-
-        return $result;
+        return new DirectoryCreator($this->directory);
     }
 
     /**
-     * @param $path
-     * @param $mode
-     * @return bool
+     * @return FileCreator
      */
-    protected function mkdir($path, $mode)
+    public function file()
     {
-        return mkdir($path, $mode, true);
-    }
-
-    /**
-     * @param $path
-     * @param $mode
-     * @return bool
-     */
-    protected function touch($path, $mode)
-    {
-        try {
-            $file = new SplFileObject($path, 'x+');
-
-            return chmod($path, $mode);
-        } catch (\Exception $e) {
-            return false;
-        }
+        return new FileCreator($this->directory);
     }
 }
