@@ -27,9 +27,10 @@ class Cleaner
     {
         $result = true;
 
-        $iterator = new RecursiveIteratorIterator(
-            new \RecursiveDirectoryIterator($path), RecursiveIteratorIterator::CHILD_FIRST
+        $directory = new \RecursiveDirectoryIterator($path,
+          \FilesystemIterator::KEY_AS_PATHNAME | \FilesystemIterator::CURRENT_AS_FILEINFO | \FilesystemIterator::SKIP_DOTS
         );
+        $iterator = new RecursiveIteratorIterator($directory, RecursiveIteratorIterator::CHILD_FIRST);
 
         foreach ($iterator as $fileInfo) {
             /** @var $fileInfo \SplFileInfo */
